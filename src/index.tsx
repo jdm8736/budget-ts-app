@@ -1,12 +1,16 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+// import { Provider } from 'react-redux';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import styled, { injectGlobal } from 'styled-components';
+// import { createStore } from 'redux'
 
+// import * as rootReducer from './store/reducers'
 import App from './components/App';
 import registerServiceWorker from './registerServiceWorker';
+import Transaction from './components/TransactionInterface';
 
 injectGlobal`
     html {
@@ -38,32 +42,34 @@ injectGlobal`
     } 
 `
 
-const mockTxnData = [
+const mockTxnData: Transaction[] = [
 { 
-    date: new Date('1/1/2018'),
+    date: new Date('1/1/2018'),    
     account: 'American_Express',
     category: 'Christmas',
-    amount: '-50.00'
+    amount: -50.00
 },
 { 
     date: new Date('1/2/2018'),
     account: 'American_Express',
     category: 'New Years',
-    amount: '-500.00'
+    amount: -500.00
 },
 { 
-    date: new Date('1/3/2018'),
+    date: new Date('12/30/2017'),
     account: 'Capital_One',
     category: 'Birthday',
-    amount: '200.00'
+    amount: 200.00
 },
 { 
-    date: new Date('1/4/2018'),
+    date: new Date('1/4/2018'),    
     account: 'Capital_One',
     category: 'Stock market',
-    amount: '-10.00'
+    amount: -10.00
 },
 ]
+
+// const store = createStore(rootReducer, {})
 
 const Main = () => {
     const Wrapper = styled.div`
@@ -78,11 +84,13 @@ const Main = () => {
     `;
 
     return (
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)} >
-            <Wrapper theme={getMuiTheme(darkBaseTheme)}>
-                <App transactions={mockTxnData}/>                
-            </Wrapper>
-        </MuiThemeProvider>
+        // <Provider store={store}>
+            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)} >
+                <Wrapper theme={getMuiTheme(darkBaseTheme)}>
+                    <App transactions={mockTxnData}/>                
+                </Wrapper>
+            </MuiThemeProvider>
+        // </Provider>
     )}
 
 ReactDOM.render(<Main />, document.getElementById('root'));

@@ -7,22 +7,33 @@ import {
     TableRow,
     TableRowColumn
 } from 'material-ui/Table';
-import { TRANSACTION_DEFAULTS } from './defaults';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
+import DatePicker from 'material-ui/DatePicker'
 
-interface Transaction {
-    date: Date;
-    account: string;
-    amount: number;
-    category: string;
+import Moment from 'react-moment';
+import * as moment from 'moment';
+
+import Transaction from '../TransactionInterface';
+
+class TransactionDefault implements Transaction {
+    date: Date = new Date('1/1/2018');
+    account: string = 'Checking';
+    amount: number = 0.0;
+    category: string = 'Food';
 }
 
-export interface Props {
+interface Props {
     transactions: Transaction[];
 }
 
-class Transactions extends React.Component<any, any> {
+interface TransactionsState {
+    transactions: Transaction[];
+    newTransaction: Transaction;
+    columns: { key: string; display: string; type: string; }[];
+}
+
+class Transactions extends React.Component<Props, TransactionsState> {
     columns = [];
 
     constructor(props: Props) {
@@ -30,7 +41,7 @@ class Transactions extends React.Component<any, any> {
 
         this.state = { 
             transactions: props.transactions,
-            newTransaction: TRANSACTION_DEFAULTS,
+            newTransaction: new TransactionDefault(),
             columns: Object.keys(props.transactions[0]).map(key => {
                 return {
                     key: key,
@@ -42,44 +53,31 @@ class Transactions extends React.Component<any, any> {
     }
     
     handleAddRow = () => {
-        //TODO fix this to user proper filtering
-        let origTxn = this.state.newTransaction;
-        let newTxnTransformed = Object.keys(this.state.newTransaction).map((key: string) => {
-            return key === 'date' ? 
-                new Date(origTxn[key])
-                : origTxn[key];
-        })
+        // TODO move all state manipulation into redux
+        // this.props.dispatch({
+        //     type: 
+        // })
+
+        // TODO move validation into a different method
+        let newDate = this.state.newTransaction.date;
+        if (!newDate || isNaN(newDate.getTime())) {
+            alert('No valid date!')
+            return 'Error!'
+        }
+
         this.setState({
             transactions: [
                 ...this.state.transactions,
-                newTxnTransformed
+                this.state.newTransaction
             ],
-            newTransaction: TRANSACTION_DEFAULTS
+            newTransaction: new TransactionDefault()
         })
+        return 'Success'
     }
 
-    updateNewEntry = (newVal: any, which: any) => {
-        let newState = Object.assign({}, this.state.newTransaction);
-        newState[which] = newVal;
-        this.setState({ newTransaction: newState });
-    }  
-  
     render() {
       return (
           <div>
-              <form onSubmit={this.handleAddRow}>
-                    {this.state.columns.map((col: any) => (
-                        <TextField 
-                            key={col.key}
-                            hintText={col.display}
-                            value={this.state.newTransaction[col.type]}
-                            onChange={(e, newVal) => {
-                                this.updateNewEntry(newVal, col.type)
-                            }}
-                        />
-                    ))}
-                    <FlatButton onClick={this.handleAddRow}>Add</FlatButton>                    
-              </form>
               <Table>
                   <TableHeader displaySelectAll={false}>
                       <TableRow>                        
@@ -87,19 +85,62 @@ class Transactions extends React.Component<any, any> {
                               <TableHeaderColumn key={col.key}>{col.display}</TableHeaderColumn>
                           ))}
                           <TableHeaderColumn />
+                          <TableHeaderColumn />
                       </TableRow>
                   </TableHeader>
                   <TableBody>
+                      <TableRow key={this.state.newTransaction.date.toString()}>
+                        {this.state.columns.map((col: any) => {
+                            if (col.type === 'date') {
+                                return (
+                                    <TableRowColumn>
+                                        <DatePicker 
+                                            onChange={(e, newVal) => {
+                                                let newState = Object.assign({}, this.state.newTransaction);
+                                                newState[col.type] = newVal;
+                                                this.setState({ newTransaction: newState });
+                                            }}
+                                            formatDate={(date: object) => {
+                                                return moment(date).format('MM/DD/YYYY');
+                                            }}
+                                            value={this.state.newTransaction[col.type]}
+                                        />
+                                    </TableRowColumn>
+                                )
+                            }
+                            return <TableRowColumn key={col.key}>
+                                        <TextField                                         
+                                            hintText={col.display}
+                                            value={this.state.newTransaction[col.type]}
+                                            onChange={(e, newVal) => {
+                                                let newState = Object.assign({}, this.state.newTransaction);
+                                                newState[col.type] = newVal;
+                                                this.setState({ newTransaction: newState });
+                                            }}
+                                        />
+                            </TableRowColumn>
+                            })
+                        }
+                        <TableRowColumn key="Add Button">
+                            <FlatButton onClick={this.handleAddRow}>Add</FlatButton>    
+                        </TableRowColumn>
+                      </TableRow>
                       {this.state.transactions
-                          .sort((txnA: any, txnB: any) => { return txnA.date < txnB.date })
+                          .sort((txnA: Transaction, txnB: Transaction) => { 
+                              return txnB.date.getTime() - txnA.date.getTime()
+                            })
                           .map((txn: any) => (
                           <TableRow key={txn.date.toString()}>
-                              {this.state.columns.map((col: any) => (
-                                  <TableRowColumn key={col.key}>{
-                                    col.type === 'date' ? 
-                                        txn[col.type].toString()
-                                        : txn[col.type]}</TableRowColumn>
-                              ))}
+                              {this.state.columns.map((col: any) => {
+                                if (col.key === 'date') {
+                                  return <TableRowColumn key={col.key}>
+                                    <Moment format="MM/DD/YYYY">{txn[col.type]}</Moment>
+                                   </TableRowColumn>    
+                                } else {
+                                  return <TableRowColumn key={col.key}>{txn[col.type]}</TableRowColumn>
+                                }
+                              })
+                            }
                               <TableRowColumn />
                           </TableRow>
                       ))}                

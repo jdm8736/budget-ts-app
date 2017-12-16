@@ -1,19 +1,21 @@
 import * as React from 'react';
 import Transactions from '../Transactions';
+import Transaction from '../TransactionInterface';
 
+type AppInterface = {
+  /**
+   * @default []
+   */
+  transactions: Transaction[];
+}
 
-// interface Transaction {
-//   date: Date;
-//   account: string;
-//   amount: number;
-//   category: string;
-// }
-
-// export interface Props {
-//   transactions: Transaction[];
-// }
-
-class App extends React.Component<any> {  
+class App extends React.Component<AppInterface, {}> {  
+  /**
+   *
+   */
+  constructor(props: AppInterface) {
+    super(props);
+  }
   render() {
     return (
       <div>
