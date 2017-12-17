@@ -4,43 +4,13 @@ import * as ReactDOM from 'react-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import styled, { injectGlobal } from 'styled-components';
+import styled from 'styled-components';
 // import { createStore } from 'redux'
 
 // import * as rootReducer from './store/reducers'
 import App from './components/App';
 import registerServiceWorker from './registerServiceWorker';
 import Transaction from './components/TransactionInterface';
-
-injectGlobal`
-    html {
-    height: 100%;
-    font-size: 16px; /* important - entire UX font size and padding is relative to this value */
-    }
-
-    body {
-    height: 100%;
-    margin: 0;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    -webkit-user-select: none;  
-    -moz-user-select: none;    
-    -ms-user-select: none;      
-    user-select: none;
-    }
-
-    html,body {
-    background-color: white;
-    }
-
-    #root {
-    height: 100%;
-    }
-
-    .container-fluid {
-    height: 100%;
-    } 
-`
 
 const mockTxnData: Transaction[] = [
 { 
