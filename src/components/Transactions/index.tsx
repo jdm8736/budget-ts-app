@@ -16,21 +16,25 @@ import * as moment from 'moment';
 
 import Transaction from '../TransactionInterface';
 
-class TransactionDefault implements Transaction {
-    date: Date = new Date('1/1/2018');
-    account: string = 'Checking';
-    amount: number = 0.0;
-    category: string = 'Food';
+let TransactionDefault: Transaction = {
+    date: new Date('1/1/2018'),
+    account: 'Checking',
+    amount: 0.0,
+    category: 'Food',
 }
 
 interface Props {
     transactions: Transaction[];
 }
 
+interface ColumnInterface {
+    key: string; display: string; type: string;
+}
+
 interface TransactionsState {
     transactions: Transaction[];
     newTransaction: Transaction;
-    columns: { key: string; display: string; type: string; }[];
+    columns: ColumnInterface[];
 }
 
 class Transactions extends React.Component<Props, TransactionsState> {
@@ -41,7 +45,8 @@ class Transactions extends React.Component<Props, TransactionsState> {
 
         this.state = { 
             transactions: props.transactions,
-            newTransaction: new TransactionDefault(),
+            newTransaction: TransactionDefault,
+            // TODO figure out better way to get column definitions
             columns: Object.keys(props.transactions[0]).map(key => {
                 return {
                     key: key,
@@ -70,7 +75,7 @@ class Transactions extends React.Component<Props, TransactionsState> {
                 ...this.state.transactions,
                 this.state.newTransaction
             ],
-            newTransaction: new TransactionDefault()
+            newTransaction: TransactionDefault
         })
         return 'Success'
     }
@@ -81,7 +86,7 @@ class Transactions extends React.Component<Props, TransactionsState> {
               <Table>
                   <TableHeader displaySelectAll={false}>
                       <TableRow>                        
-                          {this.state.columns.map((col: any) => (
+                          {this.state.columns.map((col: ColumnInterface) => ( // TODO 
                               <TableHeaderColumn key={col.key}>{col.display}</TableHeaderColumn>
                           ))}
                           <TableHeaderColumn />
@@ -90,7 +95,7 @@ class Transactions extends React.Component<Props, TransactionsState> {
                   </TableHeader>
                   <TableBody>
                       <TableRow key={this.state.newTransaction.date.toString()}>
-                        {this.state.columns.map((col: any) => {
+                        {this.state.columns.map((col: ColumnInterface) => {
                             if (col.type === 'date') {
                                 return (
                                     <TableRowColumn>
@@ -129,9 +134,9 @@ class Transactions extends React.Component<Props, TransactionsState> {
                           .sort((txnA: Transaction, txnB: Transaction) => { 
                               return txnB.date.getTime() - txnA.date.getTime()
                             })
-                          .map((txn: any) => (
+                          .map((txn: Transaction) => (
                           <TableRow key={txn.date.toString()}>
-                              {this.state.columns.map((col: any) => {
+                              {this.state.columns.map((col: ColumnInterface) => {
                                 if (col.key === 'date') {
                                   return <TableRowColumn key={col.key}>
                                     <Moment format="MM/DD/YYYY">{txn[col.type]}</Moment>
