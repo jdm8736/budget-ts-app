@@ -4,7 +4,8 @@ import * as ReactDOM from 'react-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import styled from 'styled-components'; 
+
+import styled from 'styled-components';
 // import { createStore } from 'redux'
 
 // import * as rootReducer from './store/reducers'

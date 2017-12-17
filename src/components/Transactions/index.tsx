@@ -80,6 +80,39 @@ class Transactions extends React.Component<Props, TransactionsState> {
         return 'Success'
     }
 
+    renderTransaction = (transaction: Transaction, which: string) => {
+        if (which === 'date') {
+            return (
+                <TableRowColumn>
+                    <DatePicker 
+                        onChange={(e, newVal) => {
+                            let newState = Object.assign({}, this.state.newTransaction);
+                            newState[which] = newVal;
+                            this.setState({ newTransaction: newState });
+                        }}
+                        formatDate={(date: object) => {
+                            return moment(date).format('MM/DD/YYYY');
+                        }}
+                        value={this.state.newTransaction[which]}
+                    />
+                </TableRowColumn>
+            )
+        }
+        return (
+            <TableRowColumn key={which}>
+                    <TextField                                         
+                        hintText={which}
+                        value={this.state.newTransaction[which]}
+                        onChange={(e, newVal) => {
+                            let newState = Object.assign({}, this.state.newTransaction);
+                            newState[which] = newVal;
+                            this.setState({ newTransaction: newState });
+                        }}
+                    />
+            </TableRowColumn>
+        )
+    }
+
     render() {
       return (
           <div>
@@ -90,40 +123,12 @@ class Transactions extends React.Component<Props, TransactionsState> {
                               <TableHeaderColumn key={col.key}>{col.display}</TableHeaderColumn>
                           ))}
                           <TableHeaderColumn />
-                          <TableHeaderColumn />
                       </TableRow>
                   </TableHeader>
                   <TableBody>
                       <TableRow key={this.state.newTransaction.date.toString()}>
-                        {this.state.columns.map((col: ColumnInterface) => {
-                            if (col.type === 'date') {
-                                return (
-                                    <TableRowColumn>
-                                        <DatePicker 
-                                            onChange={(e, newVal) => {
-                                                let newState = Object.assign({}, this.state.newTransaction);
-                                                newState[col.type] = newVal;
-                                                this.setState({ newTransaction: newState });
-                                            }}
-                                            formatDate={(date: object) => {
-                                                return moment(date).format('MM/DD/YYYY');
-                                            }}
-                                            value={this.state.newTransaction[col.type]}
-                                        />
-                                    </TableRowColumn>
-                                )
-                            }
-                            return <TableRowColumn key={col.key}>
-                                        <TextField                                         
-                                            hintText={col.display}
-                                            value={this.state.newTransaction[col.type]}
-                                            onChange={(e, newVal) => {
-                                                let newState = Object.assign({}, this.state.newTransaction);
-                                                newState[col.type] = newVal;
-                                                this.setState({ newTransaction: newState });
-                                            }}
-                                        />
-                            </TableRowColumn>
+                        {this.state.columns.map((col: any) => {
+                                return this.renderTransaction(this.state.newTransaction, col.type)
                             })
                         }
                         <TableRowColumn key="Add Button">
